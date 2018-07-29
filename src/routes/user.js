@@ -1,12 +1,8 @@
-import { Request, Response, Router } from 'express';
-import User from '../models/User';
+import { Router } from 'express';
+import UserController from '../controllers/user';
 
 const userRouter = Router();
 
-userRouter.get('/', (req, res) => {
-    res.status(200).send({
-        message: 'GET request successfulll!!!!'
-    });
-});
+userRouter.get('/', UserController.getAll);
 
 export default userRouter;
