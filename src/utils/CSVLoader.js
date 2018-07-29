@@ -17,10 +17,23 @@ export default class CSVLoader {
                 delimiter
             });
 
+            let firstLine = true;
+
             cvsStream
                 .on('data', async (user) => {
                     logger.info(`Received data ${JSON.stringify(user)}`);
                     cvsStream.pause();
+
+                    if (firstLine) {
+                        const sameHeaders = isEqual(dbFieldNames, Object.values(user));
+
+                        firstLine = false;
+
+                        if (!sameHeaders) {
+                            cvsStream.destroy();
+                            reject(new Error('Invalid CSV header format'));
+                        }
+                    }
 
                     try {
                         if (!isEqual(dbFieldNames, Object.values(user))) {
