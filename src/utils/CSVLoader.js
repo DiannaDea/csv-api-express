@@ -1,65 +1,64 @@
 import fs from 'fs';
 import csv from 'fast-csv';
+
+import isEqual from 'lodash.isequal';
 import pick from 'lodash.pick';
-import path from 'path';
-import UserModel from '../models/User';
-import { dbFieldNames, tempCSVFileName } from '../constants';
+
+import User from '../models/User';
+import logger from './logger';
+import { dbFieldNames } from '../constants';
+
 
 export default class CSVLoader {
-    static uploadFile(file, delimiter) {
+    static readFile(file, delimiter) {
         return new Promise((resove, reject) => {
             const cvsStream = csv.fromPath(file, {
-                headers: true,
+                headers: dbFieldNames,
                 delimiter
             });
 
             cvsStream
                 .on('data', async (user) => {
-                    console.log(`Received data ${JSON.stringify(user)}`);
-
+                    logger.info(`Received data ${JSON.stringify(user)}`);
                     cvsStream.pause();
 
                     try {
-                        await UserModel.create({ ...user });
+                        if (!isEqual(dbFieldNames, Object.values(user))) {
+                            await User.create(user);
+                        }
                     } catch (error) {
-                        console.log(error.message);
+                        logger.error(`${error.message}, user : ${JSON.stringify(user)}`);
                     }
 
                     cvsStream.resume();
-
-                    console.log('============');
                 })
-                .on('end', () => {
-                    console.log('We are done!');
-                    resove();
-                })
-                .on('error', (error) => {
-                    console.log('Error');
-                    reject(error);
-                });
+                .on('end', () => resove())
+                .on('error', error => reject(error));
         });
     }
 
-    static downloadFile() {
+    static writeFile(file, delimiter) {
         return new Promise(async (resolve, reject) => {
-            const csvStream = csv.createWriteStream({ headers: true });
-
-            const writableStream = fs.createWriteStream(path.join(__dirname, '../..', tempCSVFileName));
-
-            writableStream.on('finish', () => {
-                resolve();
-                console.log('All writes are now complete.');
+            const csvStream = csv.createWriteStream({
+                headers: dbFieldNames,
+                delimiter
             });
 
-            csvStream.pipe(writableStream);
+            const fileStream = fs.createWriteStream(file)
+                .on('finish', () => resolve())
+                .on('error', error => reject(error));
 
-            const users = await UserModel.find();
+            csvStream.pipe(fileStream);
 
-            await Promise.all(users.map((user) => {
+            const users = await User.find();
+
+            users.map((user) => {
                 csvStream.write({
                     ...pick(user, dbFieldNames)
                 });
-            }));
+            });
+
+            logger.info(`Successfully created file ${file}`);
 
             csvStream.end();
         });

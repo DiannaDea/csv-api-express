@@ -1,7 +1,7 @@
 module.exports = {
     'extends': 'airbnb-base',
     'rules': {
-        'max-len': ['error', {'code': 80}],
+        'max-len': ['error', {'code': 100}],
         'indent': [
             'error',
             4,

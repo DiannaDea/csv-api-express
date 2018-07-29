@@ -1,7 +1,10 @@
+import fs from 'fs';
 import path from 'path';
 import CSVLoader from '../utils/CSVLoader';
 
 import { tempCSVFileName, defaultDelimiter } from '../constants';
+
+import logger from '../utils/logger';
 
 
 export default class CSVController {
@@ -14,7 +17,7 @@ export default class CSVController {
                 throw new Error('Incorrect file format');
             }
 
-            await CSVLoader.uploadFile(req.files.data.path, defaultDelimiter);
+            await CSVLoader.readFile(req.files.data.path, defaultDelimiter);
 
             return res.status(200).send({
                 message: 'Successfully uploaded file'
@@ -28,16 +31,16 @@ export default class CSVController {
 
     static async download(req, res) {
         try {
-            await CSVLoader.downloadFile();
-
             const filename = path.join(__dirname, '../..', tempCSVFileName);
 
+            await CSVLoader.writeFile(filename, defaultDelimiter);
+
             res.attachment(filename).sendFile(filename, {}, (err) => {
-                if (err) {
-                    console.log('Unable to send file', err.message);
-                } else {
-                    console.log('Sent:', filename);
-                }
+                fs.unlink(filename);
+
+                (err)
+                    ? logger.error(`Unable to send file, error: ${err.message}`)
+                    : logger.info(`Sent file: ${filename}`);
             });
         } catch (error) {
             return res.status(404).send({
