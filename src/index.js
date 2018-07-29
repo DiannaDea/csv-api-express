@@ -26,8 +26,6 @@ app.listen(PORT, () => {
     console.log('Listening on port', PORT);
 });
 
-app.use((req, res) => {
-    return res.status(404).send({
-        message: 'No such route'
-    });
-});
+app.use((req, res) => res
+    .status(404)
+    .send({ message: 'Not found' }));
