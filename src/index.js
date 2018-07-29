@@ -25,3 +25,9 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log('Listening on port', PORT);
 });
+
+app.use((req, res) => {
+    return res.status(404).send({
+        message: 'No such route'
+    });
+});

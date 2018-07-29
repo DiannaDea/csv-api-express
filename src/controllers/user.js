@@ -1,10 +1,15 @@
 import pick from 'lodash.pick';
 import User from '../models/User';
+
 import { dbFieldNames } from '../constants';
 
 export default class UserController {
     static async getAll(req, res) {
         try {
+            // User.find()
+            //     .cursor({ transform: JSON.stringify })
+            //     .pipe(res.type('json'));
+
             const users = await User.find();
 
             const usersRes = users.map(user => pick(user, dbFieldNames));

@@ -16,6 +16,9 @@ export default class CSVController {
             if (req.files.data.name.match(/\.csv$/)[0] !== '.csv') {
                 throw new Error('Incorrect file format');
             }
+            if (req.files.data.size > 20000) {
+                throw new Error('Too large document, maxsize 20000 bytes');
+            }
 
             await CSVLoader.readFile(req.files.data.path, defaultDelimiter);
 
