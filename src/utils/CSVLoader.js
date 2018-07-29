@@ -1,6 +1,9 @@
+import fs from 'fs';
 import csv from 'fast-csv';
+import pick from 'lodash.pick';
+import path from 'path';
 import UserModel from '../models/User';
-
+import { dbFieldNames, tempCSVFileName } from '../constants';
 
 export default class CSVLoader {
     static uploadFile(file, delimiter) {
@@ -37,7 +40,28 @@ export default class CSVLoader {
         });
     }
 
-    static writeFile(file, data) {
+    static downloadFile() {
+        return new Promise(async (resolve, reject) => {
+            const csvStream = csv.createWriteStream({ headers: true });
 
+            const writableStream = fs.createWriteStream(path.join(__dirname, '../..', tempCSVFileName));
+
+            writableStream.on('finish', () => {
+                resolve();
+                console.log('All writes are now complete.');
+            });
+
+            csvStream.pipe(writableStream);
+
+            const users = await UserModel.find();
+
+            await Promise.all(users.map((user) => {
+                csvStream.write({
+                    ...pick(user, dbFieldNames)
+                });
+            }));
+
+            csvStream.end();
+        });
     }
 }

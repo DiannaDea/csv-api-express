@@ -6,11 +6,6 @@ const csvRouter = Router();
 
 csvRouter.post('/upload', CSVController.upload);
 
-csvRouter.post('/download', (req, res) => {
-    console.log('HERE');
-    res.status(200).send({
-        message: 'download'
-    });
-});
+csvRouter.get('/download', CSVController.download);
 
 export default csvRouter;

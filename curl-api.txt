@@ -1,0 +1,9 @@
+Upload .csv file
+curl -F 'data=@/home/diana/Documents/Users.csv' http://localhost:5000/csv/upload
+
+======
+
+Download .csv file
+curl -X GET  http://localhost:5000/csv/download
+
+======

@@ -1,1 +1,0 @@
-export default ['UserName', 'FirstName', 'LastName', 'Age'];
