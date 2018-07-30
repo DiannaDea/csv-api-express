@@ -1,6 +1,6 @@
 import { createLogger, format, transports } from 'winston';
 
-import devConfig from '../config/dev';
+import devConfig from '../config';
 
 const {
     combine, timestamp, printf
@@ -15,13 +15,13 @@ const logger = createLogger({
     ),
     transports: [
         new transports.File({
-            filename: devConfig.errorLogFile,
-            dirname: devConfig.logsDir,
+            filename: devConfig.ERROR_LOG_FILE,
+            dirname: devConfig.LOGS_DIR,
             level: 'error'
         }),
         new transports.File({
-            filename: devConfig.infoLogFile,
-            dirname: devConfig.logsDir,
+            filename: devConfig.INFO_LOG_FILE,
+            dirname: devConfig.LOGS_DIR,
             level: 'info'
         })
     ]

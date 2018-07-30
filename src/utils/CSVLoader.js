@@ -6,14 +6,14 @@ import pick from 'lodash.pick';
 
 import User from '../models/User';
 import logger from './logger';
-import { dbFieldNames } from '../constants';
+import { DB_FIELD_NAMES } from '../constants';
 
 
 export default class CSVLoader {
     static readFile(file, delimiter) {
         return new Promise((resove, reject) => {
             const cvsStream = csv.fromPath(file, {
-                headers: dbFieldNames,
+                headers: DB_FIELD_NAMES,
                 delimiter
             });
 
@@ -25,7 +25,7 @@ export default class CSVLoader {
                     cvsStream.pause();
 
                     if (firstLine) {
-                        const sameHeaders = isEqual(dbFieldNames, Object.values(user));
+                        const sameHeaders = isEqual(DB_FIELD_NAMES, Object.values(user));
 
                         firstLine = false;
 
@@ -36,7 +36,7 @@ export default class CSVLoader {
                     }
 
                     try {
-                        if (!isEqual(dbFieldNames, Object.values(user))) {
+                        if (!isEqual(DB_FIELD_NAMES, Object.values(user))) {
                             await User.create(user);
                         }
                     } catch (error) {
@@ -53,7 +53,7 @@ export default class CSVLoader {
     static writeFile(file, delimiter) {
         return new Promise(async (resolve, reject) => {
             const csvStream = csv.createWriteStream({
-                headers: dbFieldNames,
+                headers: DB_FIELD_NAMES,
                 delimiter
             });
 
@@ -67,7 +67,7 @@ export default class CSVLoader {
 
             users.map((user) => {
                 csvStream.write({
-                    ...pick(user, dbFieldNames)
+                    ...pick(user, DB_FIELD_NAMES)
                 });
             });
 

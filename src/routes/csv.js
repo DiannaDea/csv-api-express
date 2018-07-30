@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import CSVController from '../controllers/csv';
+import CSVController from '../controllers/csvController';
 
 const csvRouter = Router();
 

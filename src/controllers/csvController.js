@@ -3,7 +3,7 @@ import path from 'path';
 import formidable from 'formidable';
 import CSVLoader from '../utils/CSVLoader';
 
-import { tempCSVFileName, defaultDelimiter } from '../constants';
+import { TEMP_CSV_FILE, DEFAULT_DELIMITER } from '../constants';
 
 import logger from '../utils/logger';
 
@@ -27,7 +27,7 @@ export default class CSVController {
                     throw new Error('Too large document, max size 20000 bytes');
                 }
 
-                await CSVLoader.readFile(files.data.path, defaultDelimiter);
+                await CSVLoader.readFile(files.data.path, DEFAULT_DELIMITER);
 
                 return res.status(200).send({
                     message: 'Successfully uploaded file'
@@ -42,9 +42,9 @@ export default class CSVController {
 
     static async download(req, res) {
         try {
-            const filename = path.join(__dirname, '../..', tempCSVFileName);
+            const filename = path.join(__dirname, '../..', TEMP_CSV_FILE);
 
-            await CSVLoader.writeFile(filename, defaultDelimiter);
+            await CSVLoader.writeFile(filename, DEFAULT_DELIMITER);
 
             res.attachment(filename).sendFile(filename, {}, (err) => {
                 fs.unlink(filename);
