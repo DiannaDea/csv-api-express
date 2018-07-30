@@ -65,12 +65,15 @@ export default class CSVLoader {
 
             const users = await User.find();
 
-            users.map((user) => {
-                csvStream.write({
-                    ...pick(user, DB_FIELD_NAMES)
+            if (!users.length) {
+                csvStream.write(DB_FIELD_NAMES);
+            } else {
+                users.map((user) => {
+                    csvStream.write({
+                        ...pick(user, DB_FIELD_NAMES)
+                    });
                 });
-            });
-
+            }
             logger.info(`Successfully created file ${file}`);
 
             csvStream.end();
